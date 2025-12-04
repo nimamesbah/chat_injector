@@ -1,12 +1,15 @@
+const applyBtn = document.getElementById("applyBtn");
+
 document.addEventListener('DOMContentLoaded', () => {
 
     const savedTime = localStorage.getItem('thugChat_time');
 
 
+
     if (savedTime) document.getElementById("numInp").value = savedTime;
 });
 
-document.getElementById("applyBtn").addEventListener("click", () => {
+applyBtn.addEventListener("click", () => {
 
     const textVal = document.getElementById("textInp").value;
     const numVal = parseInt(document.getElementById("numInp").value) || 1000;
@@ -16,32 +19,41 @@ document.getElementById("applyBtn").addEventListener("click", () => {
 
     localStorage.setItem('thugChat_time', numVal);
 
-    chrome.tabs.query({
-        active: true,
-        currentWindow: true
-    }, (tabs) => {
-        const activeTab = tabs[0];
+    if (textVal && textVal.trim() !== "" && numVal >= 100) {
+        // this is how to get chrome tabs in extension
+        chrome.tabs.query({
+            active: true,
+            currentWindow: true
+            // query second arg is function we can collect tabs
+        }, (tabs) => {
+            const activeTab = tabs[0];
 
 
-        if (!activeTab.url || !activeTab.url.includes("meet.google.com")) {
-            if (showLog) showLog.innerHTML = "Not a Google Meet tab. stopping.";
-            document.getElementById("applyBtn").innerText = "Only works on Meet!";
-            return;
-        }
-
-        // injection script
-        chrome.scripting.executeScript({
-            target: {
-                tabId: activeTab.id
-            },
-            function: start,
-            args: [textVal, numVal]
+            if (!activeTab.url || !activeTab.url.includes("meet.google.com")) {
+                if (showLog) showLog.innerHTML = "Not a Google Meet tab. stopping.";
+                document.getElementById("applyBtn").innerText = "Only works on Meet!";
+                return;
+            }
+            // this is how we can enter the current site we open in the tab
+            // injection script
+            chrome.scripting.executeScript({
+                target: {
+                    tabId: activeTab.id
+                },
+                // here we add function that seperate from the extension and the cant see each other variables!!
+                function: start,
+                // this the arguments of the function we should pass to that like this
+                args: [textVal, numVal]
+            });
         });
-    });
+    } else {
+        if (showLog) showLog.innerHTML = "Invalid input. or your interval below 100ms!!";
+    }
 });
 
 // injection function
 function start(message, intervalTime) {
+
 
     let logger = document.getElementById("my-extension-logger");
 
@@ -94,13 +106,15 @@ function start(message, intervalTime) {
 
 
     function addLog(text) {
-        logContent.innerText = `> ${text}`;
+        logContent.innerText = text;
     }
 
     addLog(`Sending "${message}" every ${intervalTime}ms`);
 
+    if (window.intervalId)
+        clearInterval(window.intervalId);
     // interval starting
-    const intervalId = setInterval(() => {
+    window.intervalId = setInterval(() => {
         const box = document.querySelector("#bfTqV");
         const btn = document.querySelector("button[jsname='SoqoBf']");
 
@@ -119,7 +133,8 @@ function start(message, intervalTime) {
 
     // interval stopping and logger gone
     stopBtn.addEventListener("click", () => {
-        clearInterval(intervalId);
+        clearInterval(window.intervalId);
+        window.intervalId = null;
         stopBtn.innerText = "STOPPED";
         stopBtn.style.backgroundColor = "grey";
         addLog("--- STOPPED BY USER ---");
