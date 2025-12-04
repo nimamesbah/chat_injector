@@ -1,5 +1,7 @@
 **[!!!!download zip here!!!!!](https://github.com/nimamesbah/chat_injector/archive/refs/heads/main.zip)**
 ---
+**only for google meet (yet)**
+---
 1. Go to extensions in chrome
 ---
 2. Turn in developer mode in right top
