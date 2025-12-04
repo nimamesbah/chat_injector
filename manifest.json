@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "thug the Gmeet chat",
+  "description": "easily bang the Gmeet chats",
+  "version": "1.0",
+  "icons": {
+    "16": "icons/images.jpg",
+    "48": "icons/images.jpg",
+    "128": "icons/MV5BZjNjNzA3NTQtZmYzYS00MGM4LWEyYjMtNzZhY2YxZDk3ZTk4XkEyXkFqcGc@._V1_QL75_UX500_CR0,109,500,281_.jpg"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Click me!",
+    "default_icon": {
+      "16": "icons/images.jpg",
+      "48": "icons/images.jpg",
+      "128": "icons/MV5BZjNjNzA3NTQtZmYzYS00MGM4LWEyYjMtNzZhY2YxZDk3ZTk4XkEyXkFqcGc@._V1_QL75_UX500_CR0,109,500,281_.jpg"
+    }
+  },
+  "permissions": ["activeTab", "scripting"]
+}
