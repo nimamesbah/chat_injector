@@ -1,4 +1,4 @@
-**dowload the zip here**
+**[!!!!download zip here!!!!!](https://github.com/nimamesbah/chat_injector/archive/refs/heads/main.zip)**
 ---
 1. Go to extensions in chrome
 ---
