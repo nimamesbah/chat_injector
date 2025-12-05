@@ -113,6 +113,10 @@ function start(message, intervalTime) {
 
     if (window.intervalId)
         clearInterval(window.intervalId);
+    // if chatbox is closed it will open by it self
+    if (document.querySelector("button[data-panel-id='2']").getAttribute("aria-expanded") === "false")
+        document.querySelector("button[data-panel-id='2']").click()
+
     // interval starting
     window.intervalId = setInterval(() => {
         const box = document.querySelector("#bfTqV");
