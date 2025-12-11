@@ -29,9 +29,9 @@ applyBtn.addEventListener("click", () => {
             const activeTab = tabs[0];
 
 
-            if (!activeTab.url || !activeTab.url.includes("meet.google.com")) {
-                if (showLog) showLog.innerHTML = "Not a Google Meet tab. stopping.";
-                document.getElementById("applyBtn").innerText = "Only works on Meet!";
+            if (!activeTab.url || !activeTab.url.includes("meet.google.com") && !activeTab.url.includes("app.zoom")) {
+                if (showLog) showLog.innerHTML = "Not a Google Meet or zoom tab. stopping.";
+                document.getElementById("applyBtn").innerText = "Only works on Meet and zoom!";
                 return;
             }
             // this is how we can enter the current site we open in the tab
@@ -53,7 +53,7 @@ applyBtn.addEventListener("click", () => {
 
 // injection function
 function start(message, intervalTime) {
-
+    // debugger
 
     let logger = document.getElementById("my-extension-logger");
 
@@ -76,8 +76,19 @@ function start(message, intervalTime) {
             textAlign: "center",
             border: "2px solid red"
         });
+        // conditionally appending the logger to iframe or body in zoom
+        if (location.href.includes("zoom")) {
+            const iframe = document.querySelector("iframe.pwa-webclient__iframe");
+            const iframeDoc = iframe ? iframe.contentDocument : null;
+            if (iframeDoc) {
+                iframeDoc.body.appendChild(logger);
+            } else {
+                document.body.appendChild(logger);
+            }
 
-        document.body.appendChild(logger);
+        } else {
+            document.body.appendChild(logger);
+        }
     }
 
 
@@ -116,7 +127,7 @@ function start(message, intervalTime) {
     // if chatbox is closed it will open by it self
     switch (true) {
         case location.href.includes("meet.google.com"): {
-            if (document.querySelector("button[data-panel-id='2']").getAttribute("aria-expanded") === "false")
+            if (document.querySelector("button[data-panel-id='2']") && document.querySelector("button[data-panel-id='2']").getAttribute("aria-expanded") === "false")
                 document.querySelector("button[data-panel-id='2']").click()
 
             // interval starting
@@ -136,8 +147,73 @@ function start(message, intervalTime) {
                     addLog("Error: Box/Button not found");
                 }
             }, intervalTime);
+            break;
         }
+        case location.href.includes("zoom"): {
+            const iframe = document.querySelector("iframe.pwa-webclient__iframe");
+            const iframeDoc = iframe ? iframe.contentDocument : null;
+            // if zoom was in iframe
+            if (iframeDoc) {
 
+
+                const chatContainer = iframeDoc.querySelector("#wc-container-right");
+
+
+                if (chatContainer && chatContainer.style.visibility === "hidden") {
+                    const openBtn = iframeDoc.querySelector("div.footer-chat-button>button");
+                    if (openBtn) openBtn.click();
+                }
+
+
+                window.intervalId = setInterval(() => {
+
+                    const input = iframeDoc.querySelector("div.tiptap>p");
+                    const sendBtn = iframeDoc.querySelector("button.chat-rtf-box__send");
+
+                    if (input && sendBtn) {
+                        input.innerText = message;
+                        input.dispatchEvent(new Event('input', {
+                            bubbles: true
+                        }));
+
+                        sendBtn.removeAttribute("disabled");
+                        sendBtn.click();
+                        addLog("Sent successfully");
+                    } else {
+                        addLog("Error: Box/Button not found inside iframe");
+                    }
+                }, intervalTime);
+
+            } else {
+                console.log("Could not find iframe or access was blocked (Cross-Origin).");
+            }
+            // if zoom was not in iframe
+            if (!iframeDoc) {
+                const chatContainer = document.querySelector("#wc-container-right");
+                if (chatContainer.style.visibility === "hidden")
+                    document.querySelector("div.footer-chat-button>button").click()
+                window.intervalId = setInterval(() => {
+                    const input = document.querySelector("div.tiptap>p")
+                    const sendBtn = document.querySelector("button.chat-rtf-box__send")
+
+                    if (input && sendBtn) {
+                        input.innerText = message;
+                        input.dispatchEvent(new Event('input', {
+                            bubbles: true
+                        }));
+                        sendBtn.removeAttribute("disabled");
+                        sendBtn.click();
+                        addLog("Sent successfully");
+                    } else {
+                        addLog("Error: Box/Button not found");
+                    }
+                }, intervalTime);
+            }
+
+            break;
+
+
+        }
     }
 
 
