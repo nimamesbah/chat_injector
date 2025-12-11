@@ -1,6 +1,6 @@
 **[!!!!download zip here!!!!!](https://github.com/nimamesbah/chat_injector/archive/refs/heads/main.zip)**
 ---
-**only for google meet (yet)**
+**for google meet and zoom**
 ---
 1. Go to extensions in chrome
 ---
@@ -14,6 +14,6 @@
 ---
 6. Select the folder and extension will come
 ---
-7. when you are on meet just open the meet chatbox and enter your text and interval in the extension and it do it job
+7. when you are on any meet tab enter your text and interval in the extension and it do it job
 ---
 **enjoy nga**
